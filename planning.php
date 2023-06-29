@@ -1,3 +1,58 @@
+<?php
+// Connexion à la base de données
+$servername = "localhost";
+$username = "votre_nom_utilisateur";
+$password = "votre_mot_de_passe";
+$dbname = "reservationsalles";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Erreur de connexion à la base de données : " . $conn->connect_error);
+}
+
+// Récupération des réservations de la semaine en cours
+$today = date("Y-m-d");
+$endOfWeek = date("Y-m-d", strtotime("+7 days"));
+
+$sql = "SELECT * FROM reservations WHERE debut >= '$today' AND debut < '$endOfWeek'";
+$result = $conn->query($sql);
+
+// Tableau des jours de la semaine
+$daysOfWeek = array('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi');
+
+// Tableau des horaires de la journée
+$hoursOfDay = array('8h', '9h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h');
+
+// Création du tableau du planning
+$planning = array();
+foreach ($daysOfWeek as $day) {
+    foreach ($hoursOfDay as $hour) {
+        $planning[$day][$hour] = '';
+    }
+}
+
+// Remplissage du planning avec les réservations
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $startDateTime = new DateTime($row['debut']);
+        $endDateTime = new DateTime($row['fin']);
+
+        $dayOfWeek = $startDateTime->format('l');
+        $startHour = $startDateTime->format('G') . 'h';
+        $endHour = $endDateTime->format('G') . 'h';
+
+        $reservationInfo = $row['titre'] . ' (' . $row['id_utilisateur'] . ')';
+
+        for ($i = $startHour; $i < $endHour; $i++) {
+            $planning[$dayOfWeek][$i] = $reservationInfo;
+        }
+    }
+}
+
+// Affichage du tableau du planning
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,74 +62,50 @@
             border-collapse: collapse;
         }
 
-        table, th, td {
-            border: 1px solid black;
-        }
-
         th, td {
+            border: 1px solid black;
             padding: 5px;
-            text-align: center;
         }
     </style>
 </head>
 <body>
     <h1>Planning de la salle</h1>
-
-    <?php
-    // Obtenir la date du lundi de la semaine en cours
-    $dateLundi = strtotime('last Monday', time());
-
-    // Créer un tableau pour les jours de la semaine
-    $joursSemaine = array();
-    for ($i = 0; $i < 5; $i++) {
-        $joursSemaine[] = date('Y-m-d', strtotime("+$i day", $dateLundi));
-    }
-
-    // Créer un tableau pour les horaires
-    $heures = array();
-    for ($heure = 8; $heure < 20; $heure++) {
-        $heures[] = sprintf('%02d:00', $heure);
-    }
-
-    // Exemple de réservations
-    $reservations = array(
-        array('2023-06-24 10:00:00', 'John Doe', 'Réunion'),
-        array('2023-06-25 15:00:00', 'Jane Smith', 'Présentation'),
-        array('2023-06-27 14:00:00', 'Alice Johnson', 'Formation')
-    );
-
-    // Afficher le planning sous forme de tableau
-    echo '<table>';
-    echo '<tr><th></th>';
-    foreach ($joursSemaine as $jour) {
-        echo '<th>' . date('D d/m', strtotime($jour)) . '</th>';
-    }
-    echo '</tr>';
-
-    foreach ($heures as $heure) {
-        echo '<tr>';
-        echo '<td>' . $heure . '</td>';
-        foreach ($joursSemaine as $jour) {
-            echo '<td>';
-            foreach ($reservations as $reservation) {
-                $heureDebut = strtotime($reservation[0]);
-                $heureFin = strtotime('+1 hour', $heureDebut);
-                if ($jour == date('Y-m-d', $heureDebut) && $heure == date('H:00', $heureDebut)) {
-                    echo '<a href="reservation.php?id=' . urlencode($reservation[0]) . '">';
-                    echo $reservation[1] . '<br>';
-                    echo $reservation[2];
-                    echo '</a>';
-                } elseif ($jour == date('Y-m-d', $heureDebut) && $heure > date('H:00', $heureDebut) && $heure < date('H:00', $heureFin)) {
-                    echo '<span style="color: red;">Réservé</span>';
-                }
-            }
-            echo '</td>';
-        }
-        echo '</tr>';
-    }
-
-    echo '</table>';
-    ?>
-
+    <table>
+        <tr>
+            <th>Heure</th>
+            <?php foreach ($daysOfWeek as $day) { ?>
+                <th><?php echo $day; ?></th>
+            <?php } ?>
+        </tr>
+        <?php foreach ($hoursOfDay as $hour) { ?>
+            <tr>
+                <td><?php echo $hour; ?></td>
+                <?php foreach ($daysOfWeek as $day) { ?>
+                    <?php
+                    $reservation = $planning[$day][$hour];
+                    $reservationId = ''; // ID de la réservation
+                    if (!empty($reservation)) {
+                        $reservationParts = explode('(', $reservation);
+                        $reservationInfo = trim($reservationParts[0]);
+                        $reservationId = rtrim($reservationParts[1], ')');
+                    }
+                    ?>
+                    <td>
+                        <?php if (!empty($reservationId)) { ?>
+                            <a href="reservation.php?id=<?php echo $reservationId; ?>">
+                                <?php echo $reservationInfo; ?>
+                            </a>
+                        <?php } else { ?>
+                            <?php echo $reservation; ?>
+                        <?php } ?>
+                    </td>
+                <?php } ?>
+            </tr>
+        <?php } ?>
+    </table>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>
