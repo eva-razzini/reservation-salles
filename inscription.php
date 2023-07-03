@@ -38,6 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap');
+  </style>
+    <link rel="stylesheet" href="style6.css">
   <title>Inscription</title>
 </head>
 <body>

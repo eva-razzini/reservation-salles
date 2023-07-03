@@ -1,95 +1,76 @@
 <?php
-// ...
-
-// Vérifier si l'utilisateur est connecté
 session_start();
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+// Vérifie si l'utilisateur est connecté
+if (!isset($_SESSION['login'])) {
     header("Location: connexion.php");
-    exit;
+    exit();
 }
 
-// Vérifier si l'ID de la salle est spécifié dans le paramètre GET
-if (!isset($_GET['id'])) {
-    // Rediriger vers la page de planning si l'ID de la salle n'est pas spécifié
-    header("Location: planning.php");
-    exit;
-}
+// Vérifie si le formulaire de réservation a été soumis
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupère les données du formulaire
+    $titre = $_POST["titre"];
+    $description = $_POST["description"];
+    $debut = $_POST["debut"];
+    $fin = $_POST["fin"];
+    $id_utilisateur = $_SESSION["id_utilisateur"];
 
-// Connexion à la base de données
-$servername = "localhost";
-$dbname = "reservationsalles";
-$username = "pma";
-$password = "plomkiplomki";
+    // Connexion à la base de données
+    $host = 'localhost';
+    $dbName = 'reservationsalles';
+    $username = 'pma';
+    $password = 'plomkiplomki';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Erreur de connexion à la base de données : " . $conn->connect_error);
-}
-
-$salleId = $_GET['id'];
-
-// Récupérer les détails de la salle à partir de la base de données
-$sql = "SELECT * FROM reservations WHERE id = $salleId";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    $salle = $result->fetch_assoc();
-
-    // Vérifier si la salle est disponible pour la réservation
-    $currentDate = date('Y-m-d');
-    $currentTime = date('H:i:s');
-    if ($salle['date'] < $currentDate || ($salle['date'] == $currentDate && $salle['debut'] <= $currentTime)) {
-        // Rediriger vers la page de planning si la salle n'est pas disponible
-        header("Location: planning.php");
-        exit;
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbName;charset=utf8", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        die("Erreur de connexion à la base de données : " . $e->getMessage());
     }
 
-    // Afficher le formulaire de réservation
-    $salleId = $salle['id'];
-    $salleNom = $salle['nom'];
-    $salleDate = $salle['date'];
-    $salleDebut = $salle['debut'];
-    $salleFin = $salle['fin'];
-} else {
-    // Rediriger vers la page de planning si la salle n'existe pas
-    header("Location: planning.php");
-    exit;
-}
+    // Requête d'insertion de la réservation
+    $query = "INSERT INTO reservations (titre, description, debut, fin, id_utilisateur) VALUES (:titre, :description, :debut, :fin, :id_utilisateur)";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':titre', $titre);
+    $stmt->bindParam(':description', $description);
+    $stmt->bindParam(':debut', $debut);
+    $stmt->bindParam(':fin', $fin);
+    $stmt->bindParam(':id_utilisateur', $id_utilisateur);
+    $stmt->execute();
 
-// Fermeture de la connexion à la base de données
-$conn->close();
+    // Redirection vers la page du planning
+    header("Location: planning.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Réserver la salle <?php echo $salleNom; ?></title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap');
+  </style>
+    <link rel="stylesheet" href="style6.css">
+    <title>Réservation de salle</title>
 </head>
 <body>
-    <h1>Réserver la salle <?php echo $salleNom; ?></h1>
-    <form action="reservation-process.php" method="POST">
-        <input type="hidden" name="salleId" value="<?php echo $salleId; ?>">
-        <p>
-            <label for="titre">Titre :</label>
-            <input type="text" name="titre" id="titre" required>
-        </p>
-        <p>
-            <label for="description">Description :</label>
-            <textarea name="description" id="description" required></textarea>
-        </p>
-        <p>
-            <label for="debut">Heure de début :</label>
-            <input type="time" name="debut" id="debut" min="<?php echo $salleDebut; ?>" max="<?php echo $salleFin; ?>" required>
-        </p>
-        <p>
-            <label for="fin">Heure de fin :</label>
-            <input type="time" name="fin" id="fin" min="<?php echo $salleDebut; ?>" max="<?php echo $salleFin; ?>" required>
-        </p>
-        <p>
-            <input type="submit" value="Réserver">
-        </p>
+    <h1>Réservation de salle</h1>
+    <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST">
+        <label for="titre">Titre :</label>
+        <input type="text" name="titre" required>
+        <br>
+        <label for="description">Description :</label>
+        <textarea name="description"></textarea>
+        <br>
+        <label for="debut">Date et heure de début :</label>
+        <input type="datetime-local" name="debut" required>
+        <br>
+        <label for="fin">Date et heure de fin :</label>
+        <input type="datetime-local" name="fin" required>
+        <br>
+        <input type="submit" value="Réserver">
     </form>
 </body>
 </html>

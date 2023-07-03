@@ -1,77 +1,61 @@
 <?php
-// ...
-
-// Vérifier si l'utilisateur est connecté
+// Vérifie si l'utilisateur est connecté, sinon redirige vers la page de connexion
 session_start();
-
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+if (!isset($_SESSION['loggedin'])) {
     header("Location: connexion.php");
-    exit;
+    exit();
 }
 
-// Vérifier si l'ID de la réservation est spécifié dans le paramètre GET
-if (!isset($_GET['id'])) {
-    // Rediriger vers la page de planning si l'ID de la réservation n'est pas spécifié
-    header("Location: planning.php");
-    exit;
-}
+// Vérifie si l'ID de réservation est spécifié dans l'URL
+if (isset($_GET['id'])) {
+    $reservationId = $_GET['id'];
+    
+    // Connexion à la base de données
+    $servername = "localhost";
+    $dbname = "reservationsalles";
+    $username = "pma";
+    $password = "plomkiplomki";
 
-// Connexion à la base de données
-$servername = "localhost";
-$dbname = "reservationsalles";
-$username = "pma";
-$password = "plomkiplomki";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Erreur de connexion à la base de données : " . $conn->connect_error);
-}
-
-$reservationId = $_GET['id'];
-
-// Récupérer les détails de la réservation à partir de la base de données
-$sql = "SELECT * FROM reservations WHERE id = $reservationId";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    $reservation = $result->fetch_assoc();
-
-    // Vérifier si l'utilisateur connecté est le créateur de la réservation
-    if ($reservation['id_utilisateur'] != $_SESSION['id_utilisateur']) {
-        // Rediriger vers la page de planning si l'utilisateur n'est pas autorisé à accéder à cette réservation
-        header("Location: planning.php");
-        exit;
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Erreur de connexion à la base de données : " . $conn->connect_error);
     }
-
-    // Afficher les détails de la réservation
-    $creator = $reservation['id_utilisateur']; // Changer cela avec le nom du créateur récupéré à partir de la base de données
-    $title = $reservation['titre'];
-    $description = $reservation['description'];
-    $start = $reservation['debut'];
-    $end = $reservation['fin'];
+    
+    // Récupère les détails de la réservation en fonction de l'ID
+    $query = "SELECT * FROM reservations WHERE id = :reservationId";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':reservationId', $reservationId);
+    $stmt->execute();
+    $reservation = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Vérifie si la réservation existe
+    if (!$reservation) {
+        echo "La réservation n'existe pas.";
+        exit();
+    }
 } else {
-    // Rediriger vers la page de planning si la réservation n'existe pas
-    header("Location: planning.php");
-    exit;
+    echo "ID de réservation non spécifié.";
+    exit();
 }
-
-// Fermeture de la connexion à la base de données
-$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap');
+  </style>
+    <link rel="stylesheet" href="style6.css">
     <title>Détails de la réservation</title>
 </head>
 <body>
     <h1>Détails de la réservation</h1>
-    <p><strong>Créateur :</strong> <?php echo $creator; ?></p>
-    <p><strong>Titre :</strong> <?php echo $title; ?></p>
-    <p><strong>Description :</strong> <?php echo $description; ?></p>
-    <p><strong>Heure de début :</strong> <?php echo $start; ?></p>
-    <p><strong>Heure de fin :</strong> <?php echo $end; ?></p>
+    
+    <p><strong>Créateur :</strong> <?php echo $reservation['createur']; ?></p>
+    <p><strong>Titre :</strong> <?php echo $reservation['titre']; ?></p>
+    <p><strong>Description :</strong> <?php echo $reservation['description']; ?></p>
+    <p><strong>Heure de début :</strong> <?php echo $reservation['debut']; ?></p>
+    <p><strong>Heure de fin :</strong> <?php echo $reservation['fin']; ?></p>
 </body>
 </html>
-

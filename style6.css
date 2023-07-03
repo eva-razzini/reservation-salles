@@ -1,26 +1,33 @@
 body {
-    font-family: 'Cormorant', serif;
+    background-image: url(https://s1.1zoom.me/b3946/672/Roses_Wedding_Ring_Flower-bud_542707_1920x1080.jpg);
+    font-family: 'Tangerine', cursive;
     font-size: 50px;
-    color: #eaeaea;
-    background-color: #000000;
+    color: #ab875f;
     overflow-x: hidden;
     margin: auto;
 }
+ul {
+    display: flex;
+    justify-content: space-around;
+    background-color: #fff0e396;
+    padding: 1%;
+}
 h1 {
-    font-family: 'Cormorant', serif;
-    font-size: 1.4em;
-    color: #eaeaea;
+    font-family: 'Tangerine', cursive;
+    font-size: 4em;
+    color: #ab875f;
     padding: 0px;
     margin: 0px;
-    background-color: #1f1b1b;
     margin-top: 100px;
+    text-shadow: -2px 1px 2px black;
+    text-align: center;
 }
 a {
     text-decoration: none;
-    color: #eaeaea;
+    color: #51350a;
 }
 button {
-    font-family: 'Cormorant', serif;
+    font-family: 'Tangerine', cursive;
     text-align: center;
     width: 100%;
     padding: 10px;
@@ -32,10 +39,13 @@ button {
     font-size: 1.0em;
 }
 img {
-    margin-top: 100px;
+    margin-top: 350px;
     width: 100%;
     height: 100%;
     position: absolute;
+}
+#salle {
+    position: relative;
 }
 #logo {
     margin: 10px;
@@ -44,16 +54,16 @@ img {
     position: absolute;
 }
 p {
-    position: absolute;
-    color: #eaeaea;
-    margin-left: 7%;
+    position: relative;
+    color: #51350a;
+    text-align: center;
     margin-top: 10px;
 }
 .bouton {
     display: flex;
 }
 .bouton1, .bouton2, .bouton3 {
-    font-family: 'Cormorant', serif;
+    font-family: 'Tangerine', cursive;
     display: flex;
     margin-top: 720px;
     margin-left: 2%;
@@ -72,4 +82,69 @@ p {
 .bouton3 {
     margin-top: 570px;
     margin-left: 75%;
+}
+
+form {
+        top: 150px;
+        width: 500px;
+        position: relative;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 15px;
+        text-align: center;
+        border: solid;
+        border-color: #ab875f;
+}
+label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 60px;
+}
+input[type="text"], select, input[type="password"] {
+        width: 50%;
+        padding: 8px;
+        border: 1px solid #ab875f;
+        border-radius: 5px;
+        font-family: 'Tangerine', cursive;
+        text-align: center;
+        font-size: 30px;
+        margin-bottom: 15px;
+}
+input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #b38b5f;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-family: 'Tangerine', cursive;
+        text-align: center;
+        font-size: 25px;
+}
+#plan {
+    top: 0;
+    width: 500px;
+    position: relative;
+    margin: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    text-align: center;
+    border: solid;
+    border-color: #ab875f;
+}
+table {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.4em;
+    border-collapse: collapse;
+    margin-bottom: 100px;
+}
+tr {
+    margin: 2%;
+    font-size: 1.3em;
 }

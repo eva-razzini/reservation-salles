@@ -4,6 +4,7 @@ session_start();
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION["login"])) {
+    $_SESSION['loggedin'] = true; // Ajouter cette ligne pour indiquer que l'utilisateur est connecté
     // Redirection vers la page de connexion
     header("Location: connexion.php");
     exit;
@@ -72,10 +73,15 @@ if (isset($_GET["logout"])) {
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bruno+Ace+SC&display=swap');
+  </style>
+    <link rel="stylesheet" href="style6.css">
     <title>Profil</title>
 </head>
 <body>
-    <h2>Modifier le profil</h2>
+    <h1>Modifier le profil</h1>
     <?php if (!empty($message)) : ?>
         <div class="message"><?php echo $message; ?></div>
     <?php endif; ?>
