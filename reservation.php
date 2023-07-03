@@ -17,6 +17,17 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
+// Connexion à la base de données
+$servername = "localhost";
+$dbname = "reservationsalles";
+$username = "pma";
+$password = "plomkiplomki";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Erreur de connexion à la base de données : " . $conn->connect_error);
+}
+
 $reservationId = $_GET['id'];
 
 // Récupérer les détails de la réservation à partir de la base de données
@@ -27,7 +38,7 @@ if ($result->num_rows > 0) {
     $reservation = $result->fetch_assoc();
 
     // Vérifier si l'utilisateur connecté est le créateur de la réservation
-    if ($reservation['id_utilisateur'] != $_SESSION['id']) {
+    if ($reservation['id_utilisateur'] != $_SESSION['id_utilisateur']) {
         // Rediriger vers la page de planning si l'utilisateur n'est pas autorisé à accéder à cette réservation
         header("Location: planning.php");
         exit;

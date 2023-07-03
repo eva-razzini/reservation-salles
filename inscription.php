@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password === $confirmPassword) {
         // Connexion à la base de données
         $host = "localhost";
-        $dbname = "resevationsalles";
+        $dbname = "reservationsalles";
         $username = "pma";
         $passwordDB = "plomkiplomki";
         
@@ -38,25 +38,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Inscription</title>
+  <title>Inscription</title>
 </head>
 <body>
-    <h1>Inscription</h1>
-    <form action="inscription_traitement.php" method="post">
-        <label for="nom">Nom :</label>
-        <input type="text" id="nom" name="nom" required><br>
-
-        <label for="email">Email :</label>
-        <input type="email" id="email" name="email" required><br>
-
-        <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required><br>
-
-        <label for="confirm_password">Confirmez le mot de passe :</label>
-        <input type="password" id="confirm_password" name="confirm_password" required><br>
-
-        <input type="submit" value="S'inscrire">
-    </form>
+  <h1>Inscription</h1>
+  <form method="POST" action="inscription.php">
+    <label for="login">Login:</label>
+    <input type="text" name="login" required><br>
+    
+    <label for="password">Mot de passe:</label>
+    <input type="password" name="password" required><br>
+    
+    <label for="confirm_password">Confirmez le mot de passe:</label>
+    <input type="password" name="confirm_password" required><br>
+    
+    <input type="submit" value="S'inscrire">
+  </form>
 </body>
 </html>
 

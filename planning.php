@@ -1,9 +1,10 @@
 <?php
+session_start();
 // Connexion à la base de données
 $servername = "localhost";
-$username = "votre_nom_utilisateur";
-$password = "votre_mot_de_passe";
 $dbname = "reservationsalles";
+$username = "pma";
+$password = "plomkiplomki";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -49,13 +50,15 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Affichage du tableau du planning
+// Fermeture de la connexion à la base de données
+$conn->close();
 ?>
 
 
 <!DOCTYPE html>
 <html>
 <head>
+<!-- <link rel="stylesheet" href="style6.css"> -->
     <title>Planning de la salle</title>
     <style>
         table {
@@ -70,6 +73,14 @@ if ($result->num_rows > 0) {
 </head>
 <body>
     <h1>Planning de la salle</h1>
+
+    <?php if (isset($_SESSION["login"])) { ?>
+        <form action="reservation-form.php" method="GET">
+            <input type="submit" value="Réserver">
+        </form>
+    <?php } ?>
+
+
     <table>
         <tr>
             <th>Heure</th>
@@ -103,9 +114,13 @@ if ($result->num_rows > 0) {
             </tr>
         <?php } ?>
     </table>
+    <?php
+    // Afficher le message de réservation réussie s'il est présent
+    if (isset($_SESSION['reservation_success'])) {
+        echo "<p>" . $_SESSION['reservation_success'] . "</p>";
+        unset($_SESSION['reservation_success']); // Supprimer le message de la variable de session
+    }
+    ?>
+
 </body>
 </html>
-
-<?php
-$conn->close();
-?>

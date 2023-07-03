@@ -15,7 +15,7 @@ unset($_SESSION["profil_message"]); // Supprimer le message de la variable de se
 
 // Récupérer les informations de l'utilisateur connecté depuis la base de données
 $host = "localhost";
-$dbname = "livreor";
+$dbname = "reservationsalles";
 $username = "pma";
 $passwordDB = "plomkiplomki";
 
@@ -63,7 +63,7 @@ if (isset($_GET["logout"])) {
     session_destroy();
 
     // Redirection vers la page de connexion
-    header("Location: connexion.php");
+    header("Location: index.php");
     exit;
 }
 ?>
@@ -75,19 +75,26 @@ if (isset($_GET["logout"])) {
     <title>Profil</title>
 </head>
 <body>
-    <h1>Modifier le profil</h1>
-    <form action="profil_traitement.php" method="post">
-        <label for="login">Login actuel :</label>
-        <input type="text" id="login" name="login" value="JohnDoe" readonly><br>
+    <h2>Modifier le profil</h2>
+    <?php if (!empty($message)) : ?>
+        <div class="message"><?php echo $message; ?></div>
+    <?php endif; ?>
+    <form method="POST" action="profil.php">
+        <label for="new_login">Nouveau login:</label>
+        <input type="text" name="new_login" required value="<?php echo $_SESSION['login']; ?>"><br>
 
-        <label for="new_password">Nouveau mot de passe :</label>
-        <input type="password" id="new_password" name="new_password" required><br>
-
-        <label for="confirm_password">Confirmez le nouveau mot de passe :</label>
-        <input type="password" id="confirm_password" name="confirm_password" required><br>
+        <label for="new_password">Nouveau mot de passe:</label>
+        <input type="password" name="new_password" required><br>
 
         <input type="submit" value="Modifier">
     </form>
+    <br>
+    <a href="planning.php">Voir le Planning</a>
+    <br>
+    <a href="reservation.php">Mes réservations</a>
+    <br>
+    <a href="profil.php?logout">Se déconnecter</a>
 </body>
 </html>
+
 
